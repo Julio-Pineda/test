@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Electoral 3.0</title>
+    <title>Monitor Electoral Departamental</title>
     <style>
-        /* Variables CSS */
+        /* --- VARIABLES Y TEMA --- */
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
-            --danger: #e74c3c; /* Rojo Reclamación */
-            --success: #2ecc71; /* Verde Novedad */
+            --danger: #e74c3c;
+            --success: #2ecc71;
             --bg: #f4f6f7;
             --card-bg: #ffffff;
             --text: #333333;
@@ -20,7 +20,6 @@
             --shadow: rgba(0,0,0,0.1);
         }
 
-        /* Tema Oscuro */
         [data-theme="dark"] {
             --primary: #1a252f;
             --secondary: #2980b9;
@@ -36,184 +35,107 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
-        
         body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
 
-        /* Header */
+        /* HEADER */
         header {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: var(--primary); color: white; padding: 1rem 1.5rem;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px var(--shadow); position: sticky; top: 0; z-index: 100;
         }
         header h1 { font-size: 1.2rem; font-weight: 600; }
-        
-        .theme-toggle {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 1.2rem;
-        }
+        .theme-toggle { background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 20px; font-size: 1.2rem; }
 
-        /* Convenciones */
+        /* CONVENCIONES */
         .legend-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 15px 10px 5px 10px;
-            font-size: 0.9rem;
-            flex-wrap: wrap;
+            display: flex; justify-content: center; gap: 20px; padding: 15px 10px 5px 10px;
+            font-size: 0.9rem; flex-wrap: wrap;
         }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .bg-red { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
         .bg-green { background: var(--success); box-shadow: 0 0 5px var(--success); }
 
-        /* Buscador */
-        .search-container {
-            max-width: 800px;
-            margin: 1rem auto;
-            padding: 0 1rem;
+        /* MUNICIPIOS GRID */
+        .municipios-container {
+            max-width: 900px; margin: 15px auto; padding: 0 1rem;
         }
-        #searchInput {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
+        .muni-title { font-size: 0.9rem; color: var(--text-light); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .muni-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 8px;
+        }
+
+        .muni-btn {
+            background: var(--card-bg);
             border: 1px solid var(--border);
-            background: var(--card-bg);
             color: var(--text);
-            font-size: 16px;
-            box-shadow: 0 2px 4px var(--shadow);
-        }
-
-        /* Lista */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px var(--shadow);
+            padding: 8px 5px;
+            border-radius: 6px;
             cursor: pointer;
-            border-left: 4px solid var(--secondary);
-            position: relative;
+            font-size: 0.85rem;
+            text-align: center;
+            transition: 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .muni-btn:hover { border-color: var(--secondary); color: var(--secondary); transform: translateY(-1px); }
+        .muni-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.4);
+        }
+
+        /* BUSCADOR */
+        .search-container { max-width: 800px; margin: 1rem auto; padding: 0 1rem; }
+        #searchInput {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--card-bg); color: var(--text); font-size: 16px; box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        /* LISTA */
+        .container { max-width: 800px; margin: 0 auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 12px; }
+        
+        .card {
+            background: var(--card-bg); padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 2px 5px var(--shadow); cursor: pointer; border-left: 4px solid var(--secondary);
         }
         .card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--shadow); }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .badge {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: var(--text);
-        }
-
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .badge { background: var(--bg); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: var(--text); }
         .mesa-badge { background: var(--secondary); color: white; border: none; }
-
-        .card-main-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text);
-            flex: 1; /* Ocupa espacio disponible */
-            padding-right: 10px;
-        }
+        .card-main-row { display: flex; justify-content: space-between; align-items: center; }
+        .card-title { font-size: 1.1rem; font-weight: 600; color: var(--text); flex: 1; padding-right: 10px; }
 
         /* PUNTOS INDICADORES */
-        .indicators-wrapper {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+        .indicators-wrapper { display: flex; gap: 8px; align-items: center; }
+        .dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; }
+        .dot-red { background-color: var(--danger); box-shadow: 0 0 8px var(--danger); animation: pulse-red 2s infinite; }
+        .dot-green { background-color: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse-green 2.5s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
 
-        .dot {
-            height: 12px;
-            width: 12px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .dot-red {
-            background-color: var(--danger);
-            box-shadow: 0 0 8px var(--danger);
-            animation: pulse-red 2s infinite;
-        }
-
-        .dot-green {
-            background-color: var(--success);
-            box-shadow: 0 0 8px var(--success);
-            animation: pulse-green 2.5s infinite;
-        }
-
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-        }
-
-        @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(46, 204, 113, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
-        }
-
-        /* Loading */
+        /* LOADER */
         .loader { text-align: center; padding: 2rem; color: var(--text-light); }
 
         /* MODAL */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--modal-overlay);
-            display: none; justify-content: center; align-items: center;
+            background: var(--modal-overlay); display: none; justify-content: center; align-items: center;
             z-index: 1000; backdrop-filter: blur(3px);
         }
-
         .modal-content {
-            background: var(--card-bg); color: var(--text);
-            width: 95%; max-width: 900px; height: 90vh;
-            border-radius: 10px; display: flex; flex-direction: column;
-            overflow: hidden; animation: slideUp 0.3s ease-out;
+            background: var(--card-bg); color: var(--text); width: 95%; max-width: 900px; height: 90vh;
+            border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s ease-out;
         }
-
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        .modal-header {
-            padding: 15px; background: var(--primary); color: white;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        
+        .modal-header { padding: 15px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
         .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-
         .modal-body { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; }
 
         .info-grid {
@@ -221,27 +143,19 @@
             background: var(--bg); padding: 15px; border-radius: 8px;
             font-size: 0.9rem; border: 1px solid var(--border);
         }
-        
         .novedad-box { border-left: 3px solid var(--success); padding-left: 10px; margin-top: 10px; }
         .reclamacion-box { border-left: 3px solid var(--danger); padding-left: 10px; margin-top: 10px; }
-        
         .label-success { font-weight: bold; color: var(--success); display: block; margin-bottom: 4px;}
         .label-danger { font-weight: bold; color: var(--danger); display: block; margin-bottom: 4px;}
 
-        /* Tabs */
+        /* TABS & PDF */
         .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 10px; }
-        .tab-btn {
-            padding: 10px 15px; border: none; background: none; cursor: pointer;
-            font-weight: 600; color: var(--text-light); border-bottom: 3px solid transparent; transition: 0.3s;
-        }
+        .tab-btn { padding: 10px 15px; border: none; background: none; cursor: pointer; font-weight: 600; color: var(--text-light); border-bottom: 3px solid transparent; transition: 0.3s; }
         .tab-btn:hover { color: var(--secondary); }
         .tab-btn.active { color: var(--secondary); border-bottom: 3px solid var(--secondary); }
-        
         .tab-content { display: none; flex: 1; min-height: 300px; background: #eee; border-radius: 4px; }
         .tab-content.active { display: block; height: 100%; }
-
         iframe { width: 100%; height: 100%; border: none; min-height: 400px; background: white; }
-        
         .fallback-link { padding: 20px; text-align: center; color: #333; }
         .btn-link { display: inline-block; margin-top: 10px; padding: 8px 16px; background: var(--secondary); color: white; text-decoration: none; border-radius: 4px; }
 
@@ -257,15 +171,16 @@
     </button>
 </header>
 
-<!-- Convenciones -->
 <div class="legend-container">
-    <div class="legend-item">
-        <span class="legend-dot bg-red"></span>
-        <span>Reclamación</span>
-    </div>
-    <div class="legend-item">
-        <span class="legend-dot bg-green"></span>
-        <span>Anotación/Novedad</span>
+    <div class="legend-item"><span class="legend-dot bg-red"></span><span>Reclamación</span></div>
+    <div class="legend-item"><span class="legend-dot bg-green"></span><span>Anotación/Novedad</span></div>
+</div>
+
+<!-- SECCIÓN MUNICIPIOS -->
+<div class="municipios-container">
+    <div class="muni-title">Seleccionar Municipio:</div>
+    <div id="gridMunicipios" class="muni-grid">
+        <!-- Los botones se generarán con JS aquí -->
     </div>
 </div>
 
@@ -273,7 +188,7 @@
     <input type="text" id="searchInput" placeholder="Buscar por puesto, mesa o código...">
 </div>
 
-<div id="loading" class="loader">Cargando datos...</div>
+<div id="loading" class="loader">Seleccione un municipio...</div>
 <div id="listContainer" class="container"></div>
 
 <!-- MODAL -->
@@ -284,86 +199,129 @@
             <button class="close-btn" onclick="closeModal()">&times;</button>
         </div>
         <div class="modal-body">
-            
             <div class="info-grid">
-                <div>
-                    <strong>Zona:</strong> <span id="mZona"></span> | 
-                    <strong>Puesto:</strong> <span id="mPuesto"></span>
-                </div>
-                <div>
-                    <strong>Mesa:</strong> <span class="badge mesa-badge" id="mMesa"></span>
-                </div>
+                <div><strong>Zona:</strong> <span id="mZona"></span> | <strong>Puesto:</strong> <span id="mPuesto"></span></div>
+                <div><strong>Mesa:</strong> <span class="badge mesa-badge" id="mMesa"></span></div>
                 <div style="grid-column: 1/-1;">
-                    <!-- Caja de Novedades (Verde) -->
                     <div id="containerNovedades">
-                        <div class="novedad-box">
-                            <span class="label-success">Anotaciones Asamblea:</span>
-                            <span id="novAsamblea">Ninguna</span>
-                        </div>
-                        <div class="novedad-box">
-                            <span class="label-success">Anotaciones Concejo:</span>
-                            <span id="novConcejo">Ninguna</span>
-                        </div>
+                        <div class="novedad-box"><span class="label-success">Anotaciones Asamblea:</span><span id="novAsamblea">Ninguna</span></div>
+                        <div class="novedad-box"><span class="label-success">Anotaciones Concejo:</span><span id="novConcejo">Ninguna</span></div>
                     </div>
-                    
-                    <!-- Caja de Reclamación (Roja) -->
                      <div id="reclamoContainer" class="reclamacion-box" style="display:none;">
                         <span class="label-danger">¡Atención! Reclamación Detectada:</span>
                         <span>Existe un documento de reclamación adjunto. Revise la pestaña correspondiente.</span>
                     </div>
                 </div>
             </div>
-
-            <!-- Tabs -->
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <div class="tabs">
                     <button class="tab-btn active" onclick="openTab('tabE14Concejo')">E14 Concejo</button>
                     <button class="tab-btn" onclick="openTab('tabE14Asamblea')">E14 Asamblea</button>
                     <button class="tab-btn" onclick="openTab('tabReclamacion')">Reclamación</button>
                 </div>
-
                 <div id="tabE14Concejo" class="tab-content active"></div>
                 <div id="tabE14Asamblea" class="tab-content"></div>
                 <div id="tabReclamacion" class="tab-content"></div>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1epDUpM6Ocw-R_3CggSfzgZILq2c7C2cueBArXKG6emQ/export?format=csv';
-    let allData = [];
+    // --- DATOS DE MUNICIPIOS EXTRAÍDOS ---
+    const municipios = [
+        { name: "POPAYAN", url: "https://docs.google.com/spreadsheets/d/1-Pmx3R9MD0MvtkSGHiKlOCsmmhjNtWCdWRy9NyfIshY/edit?usp=drive_link" },
+        { name: "CAJIBIO", url: "https://docs.google.com/spreadsheets/d/1D4xh8f-n2UmrdC-fGH6E3gtL8j7ycTFbEb5wnkI-VzQ/edit?usp=drive_link" },
+        { name: "CALOTO", url: "https://docs.google.com/spreadsheets/d/195-zmz4c7HbGn0ngBaL4yDUJ-lR4DA69hkywy2InCbE/edit?usp=drive_link" },
+        { name: "CORINTO", url: "https://docs.google.com/spreadsheets/d/1kZofOxvM7VKotXS5JW4xB0-B9c_utM0sAiZq6y-FhtM/edit?usp=drive_link" },
+        { name: "EL TAMBO", url: "https://docs.google.com/spreadsheets/d/1DIwcx_j6VHTeRBIdn4EKAR-rBTBOlQ7ePt3Zy6AIYaU/edit?usp=drive_link" },
+        { name: "GUACHENE", url: "https://docs.google.com/spreadsheets/d/1ytmK4aX6rVJVbtGQKtxBHUt2cQm93fH560Kw08A35Qs/edit?usp=drive_link" },
+        { name: "LA SIERRA", url: "https://docs.google.com/spreadsheets/d/19wbJPPcvSEq6I6AAX850QjZGO44DLaZyedMZGQGjKAg/edit?usp=drive_link" },
+        { name: "MERCADERES", url: "https://docs.google.com/spreadsheets/d/1rbzqJDePpYAaw1_-WnGdbEAxoIY_1QO3nsMWp8nirPY/edit?usp=drive_link" },
+        { name: "MIRANDA", url: "https://docs.google.com/spreadsheets/d/1ViRjM0fTcNmg5piYUxS12bHst6a2EExlI-0aTtOL59I/edit?usp=drive_link" },
+        { name: "MORALES", url: "https://docs.google.com/spreadsheets/d/1x1UHjJyqsF8KCdRtFXNnnEjqwPvCXBvIteCU8oCVX-Y/edit?usp=drive_link" },
+        { name: "PATIA (BORDO)", url: "https://docs.google.com/spreadsheets/d/15I-sFAN8vCdjjAgvU1-KYgEuLO0PoYZSCehLbpbGoSk/edit?usp=drive_link" },
+        { name: "PIENDAMO", url: "https://docs.google.com/spreadsheets/d/12FzAJJ1AUfj0M4hb3vKYYMyHa617pXn-Y7f-qHCcnsw/edit?usp=drive_link" },
+        { name: "PUERTO TEJADA", url: "https://docs.google.com/spreadsheets/d/1dD38hBH5LrTjaor4sN66H2rbxLjqQfUdeYMrn8Muo4o/edit?usp=drive_link" },
+        { name: "ROSAS", url: "https://docs.google.com/spreadsheets/d/1aZnMfa_aQCgrTkmL38F3b_q4K-FmsDTu2E-4hT7cJDs/edit?usp=drive_link" },
+        { name: "SANTANDER", url: "https://docs.google.com/spreadsheets/d/1J9RydTcOo7KYptiojLvyoAhTvm1NbDjgzevlIOO6-S4/edit?usp=drive_link" },
+        { name: "SUCRE", url: "https://docs.google.com/spreadsheets/d/1tcCb721Fm18l7H3Hi1bizmjbjAPEJ5IpsYIm1iO-zDM/edit?usp=drive_link" },
+        { name: "TIMBIO", url: "https://docs.google.com/spreadsheets/d/1epDUpM6Ocw-R_3CggSfzgZILq2c7C2cueBArXKG6emQ/edit?usp=drive_link" },
+        { name: "VILLA RICA", url: "https://docs.google.com/spreadsheets/d/1IJugGUsq5TJoTP79O8yvcHHi6yMeHLoG8tDEP7PmYJA/edit?usp=drive_link" }
+    ];
 
-    // --- Modo Oscuro ---
-    function toggleTheme() {
-        const body = document.body;
-        const icon = document.getElementById('themeIcon');
-        if (body.getAttribute('data-theme') === 'dark') {
-            body.removeAttribute('data-theme');
-            icon.innerText = '🌙';
-            localStorage.setItem('theme', 'light');
-        } else {
-            body.setAttribute('data-theme', 'dark');
-            icon.innerText = '☀️';
-            localStorage.setItem('theme', 'dark');
+    let allData = [];
+    let currentSheetUrl = "";
+
+    // --- FUNCIONES CORE ---
+
+    // 1. Inicializar Botonera
+    function initMunicipios() {
+        const grid = document.getElementById('gridMunicipios');
+        municipios.forEach((muni, index) => {
+            const btn = document.createElement('div');
+            btn.className = 'muni-btn';
+            btn.innerText = muni.name;
+            btn.onclick = () => loadMunicipioData(muni, btn);
+            grid.appendChild(btn);
+            
+            // Cargar el primero por defecto (Popayan)
+            if (index === 0) loadMunicipioData(muni, btn);
+        });
+    }
+
+    // 2. Transformar URL (Edit -> Export CSV)
+    function getCsvUrl(driveUrl) {
+        try {
+            // Extraer ID
+            const id = driveUrl.split('/d/')[1].split('/')[0];
+            return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`;
+        } catch (e) {
+            console.error("Error parseando URL", driveUrl);
+            return null;
         }
     }
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.setAttribute('data-theme', 'dark');
-        document.getElementById('themeIcon').innerText = '☀️';
+
+    // 3. Cargar Datos
+    async function loadMunicipioData(muniObj, btnElement) {
+        // UI Updates
+        document.querySelectorAll('.muni-btn').forEach(b => b.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+        
+        document.getElementById('listContainer').innerHTML = '';
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('loading').innerText = `Cargando datos de ${muniObj.name}...`;
+
+        const csvUrl = getCsvUrl(muniObj.url);
+        
+        try {
+            const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error("Error de red");
+            const text = await response.text();
+            const rawRows = parseCSV(text);
+            
+            // Mapeo: 0:Codigo, 1:Zona, 2:Puesto, 3:Mesa, 4:Nombre, 5:LinkC, 6:LinkA, 7:LinkR, 8:NovA, 9:NovC
+            allData = rawRows.slice(1).map(r => ({
+                codigo: r[0], zona: r[1], puesto: r[2], mesa: r[3], nombre: r[4],
+                linkConcejo: r[5], linkAsamblea: r[6], linkReclamacion: r[7],
+                novAsamblea: r[8], novConcejo: r[9]
+            })).filter(item => item.mesa); 
+
+            renderList(allData);
+            document.getElementById('loading').style.display = 'none';
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('loading').innerHTML = `Error cargando ${muniObj.name}.<br>Verifique acceso o intente nuevamente.`;
+        }
     }
 
-    // --- Parseo CSV ---
+    // --- LÓGICA GENERAL (Igual que antes) ---
+
     function parseCSV(text) {
-        const rows = [];
-        let currentRow = [];
-        let currentVal = '';
-        let inQuotes = false;
-        
+        const rows = []; let currentRow = []; let currentVal = ''; let inQuotes = false;
         for (let i = 0; i < text.length; i++) {
-            const char = text[i];
-            const nextChar = text[i+1];
+            const char = text[i]; const nextChar = text[i+1];
             if (inQuotes) {
                 if (char === '"' && nextChar === '"') { currentVal += '"'; i++; }
                 else if (char === '"') { inQuotes = false; }
@@ -382,42 +340,15 @@
         return rows;
     }
 
-    // --- Fetch Data ---
-    async function fetchData() {
-        try {
-            const response = await fetch(SHEET_URL);
-            const text = await response.text();
-            const rawRows = parseCSV(text);
-            
-            // CSV: 0:Codigo, 1:Zona, 2:Puesto, 3:Mesa, 4:Nombre, 5:LinkC, 6:LinkA, 7:LinkR, 8:NovA, 9:NovC
-            allData = rawRows.slice(1).map(r => ({
-                codigo: r[0],
-                zona: r[1],
-                puesto: r[2],
-                mesa: r[3],
-                nombre: r[4],
-                linkConcejo: r[5],
-                linkAsamblea: r[6],
-                linkReclamacion: r[7],
-                novAsamblea: r[8],
-                novConcejo: r[9]
-            })).filter(item => item.mesa); 
-
-            renderList(allData);
-            document.getElementById('loading').style.display = 'none';
-        } catch (error) {
-            console.error(error);
-            document.getElementById('loading').innerHTML = 'Error de conexión.';
-        }
-    }
-
-    // --- Renderizado Lista ---
     function renderList(data) {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
+        if(data.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px;">No se encontraron registros.</div>';
+            return;
+        }
 
         data.forEach((item) => {
-            // Lógica de Puntos
             const hasReclamacion = (item.linkReclamacion && item.linkReclamacion.length > 5);
             const hasNovedades = (item.novAsamblea && item.novAsamblea.trim() !== '') || (item.novConcejo && item.novConcejo.trim() !== '');
 
@@ -425,12 +356,8 @@
             card.className = 'card';
             
             let indicatorsHtml = '<div class="indicators-wrapper">';
-            if (hasReclamacion) {
-                indicatorsHtml += `<span class="dot dot-red" title="Reclamación presente"></span>`;
-            }
-            if (hasNovedades) {
-                indicatorsHtml += `<span class="dot dot-green" title="Anotaciones presentes"></span>`;
-            }
+            if (hasReclamacion) indicatorsHtml += `<span class="dot dot-red" title="Reclamación presente"></span>`;
+            if (hasNovedades) indicatorsHtml += `<span class="dot dot-green" title="Anotaciones presentes"></span>`;
             indicatorsHtml += '</div>';
 
             card.innerHTML = `
@@ -449,7 +376,6 @@
         });
     }
 
-    // --- Buscador ---
     document.getElementById('searchInput').addEventListener('keyup', (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = allData.filter(item => 
@@ -461,7 +387,26 @@
         renderList(filtered);
     });
 
-    // --- Modal y PDF ---
+    // --- MANEJO DE MODO OSCURO ---
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('themeIcon');
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            icon.innerText = '🌙';
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            icon.innerText = '☀️';
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+        document.getElementById('themeIcon').innerText = '☀️';
+    }
+
+    // --- MODAL Y PDF HELPERS ---
     function getEmbedLink(link) {
         if (!link) return null;
         try {
@@ -470,7 +415,7 @@
                 return `https://drive.google.com/file/d/${id}/preview`;
             }
             if (link.includes('/d/')) {
-                return link.replace('/view', '/preview').replace('/open', '/preview');
+                return link.replace('/view', '/preview').replace('/open', '/preview').replace('/edit', '/preview');
             }
         } catch (e) { return link; }
         return link;
@@ -500,7 +445,6 @@
         document.getElementById('mZona').innerText = item.zona || '-';
         document.getElementById('mPuesto').innerText = item.puesto || '-';
         document.getElementById('mMesa').innerText = item.mesa || '-';
-        
         document.getElementById('novAsamblea').innerText = item.novAsamblea || 'Ninguna';
         document.getElementById('novConcejo').innerText = item.novConcejo || 'Ninguna';
 
@@ -510,7 +454,6 @@
         renderPDFContainer('tabE14Concejo', item.linkConcejo);
         renderPDFContainer('tabE14Asamblea', item.linkAsamblea);
         renderPDFContainer('tabReclamacion', item.linkReclamacion);
-
         openTab('tabE14Concejo');
         document.getElementById('modal').style.display = 'flex';
     }
@@ -522,9 +465,7 @@
         document.getElementById('tabReclamacion').innerHTML = '';
     }
 
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('modal')) closeModal();
-    }
+    window.onclick = function(event) { if (event.target == document.getElementById('modal')) closeModal(); }
 
     window.openTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -535,7 +476,8 @@
         });
     }
 
-    fetchData();
+    // INICIAR
+    initMunicipios();
 
 </script>
 </body>
