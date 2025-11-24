@@ -3,50 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor Electoral Pro</title>
+    <title>Monitor Electoral Final</title>
+    <!-- Iconos Phosphor (Más ligeros y bonitos que FontAwesome) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* --- VARIABLES Y TEMA --- */
+        /* --- VARIABLES --- */
         :root {
             --primary: #2c3e50;
-            --bg: #f8f9fa;
+            --bg: #f3f4f6;
             --card-bg: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --border: #e2e8f0;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --modal-overlay: rgba(0,0,0,0.6);
 
-            /* Colores Semánticos (Badges) - Modo Claro */
-            --badge-zona-bg: #fffaf0; --badge-zona-text: #c05621; --badge-zona-border: #fbd38d;
-            --badge-puesto-bg: #ebf8ff; --badge-puesto-text: #2c5282; --badge-puesto-border: #bee3f8;
-            --badge-mesa-bg: #f3f0ff; --badge-mesa-text: #553c9a; --badge-mesa-border: #d6bcfa; /* Morado elegante */
+            /* Colores Semánticos */
+            --brand: #3b82f6; /* Azul moderno */
+            --danger: #ef4444;
+            --success: #10b981;
+            --success-bg: #d1fae5;
             
-            /* Indicadores */
-            --danger: #e53e3e;
-            --success: #38a169;
-            --brand: #3182ce;
+            /* Badges */
+            --badge-zona-bg: #fff7ed; --badge-zona-text: #9a3412; --badge-zona-border: #fed7aa;
+            --badge-puesto-bg: #eff6ff; --badge-puesto-text: #1e40af; --badge-puesto-border: #bfdbfe;
         }
 
         [data-theme="dark"] {
-            --primary: #1a202c;
-            --bg: #0f1115;
-            --card-bg: #1a202c;
-            --text-main: #f7fafc;
-            --text-muted: #a0aec0;
-            --border: #2d3748;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --primary: #111827;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             --modal-overlay: rgba(0,0,0,0.8);
 
-            /* Colores Semánticos (Badges) - Modo Oscuro (Más saturados para contraste) */
-            --badge-zona-bg: #2c2113; --badge-zona-text: #fbd38d; --badge-zona-border: #7b341e;
-            --badge-puesto-bg: #102a43; --badge-puesto-text: #90cdf4; --badge-puesto-border: #2c5282;
-            --badge-mesa-bg: #241c35; --badge-mesa-text: #d6bcfa; --badge-mesa-border: #553c9a;
-            
-            --brand: #63b3ed;
+            --brand: #60a5fa;
+            --badge-zona-bg: #431407; --badge-zona-text: #fdba74; --badge-zona-border: #7c2d12;
+            --badge-puesto-bg: #172554; --badge-puesto-text: #93c5fd; --badge-puesto-border: #1e3a8a;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif; transition: background-color 0.2s, color 0.2s; }
-        body { background-color: var(--bg); color: var(--text-main); padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; transition: all 0.2s ease; }
+        body { background-color: var(--bg); color: var(--text-main); padding-bottom: 80px; }
 
         /* HEADER */
         header {
@@ -54,176 +53,134 @@
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
         }
-        header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
-        .theme-toggle { background: rgba(255,255,255,0.15); border: none; color: white; cursor: pointer; padding: 8px 12px; border-radius: 50%; font-size: 1.1rem; transition: 0.2s; }
-        .theme-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+        header h1 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .theme-toggle { background: rgba(255,255,255,0.1); border: none; color: white; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
 
         /* CONVENCIONES */
         .legend-container {
-            display: flex; justify-content: center; gap: 20px; padding: 15px 10px 5px 10px;
-            font-size: 0.85rem; flex-wrap: wrap; color: var(--text-muted); font-weight: 500;
+            display: flex; justify-content: center; gap: 15px; padding: 15px;
+            font-size: 0.8rem; flex-wrap: wrap;
         }
-        .legend-item { display: flex; align-items: center; gap: 8px; background: var(--card-bg); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .bg-red { background: var(--danger); }
-        .bg-green { background: var(--success); }
+        .legend-item { display: flex; align-items: center; gap: 6px; background: var(--card-bg); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-        /* MUNICIPIOS GRID */
-        .municipios-container { max-width: 900px; margin: 20px auto; padding: 0 1rem; }
-        .muni-title { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        
-        .muni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-
+        /* MUNICIPIOS */
+        .municipios-container { max-width: 900px; margin: 10px auto; padding: 0 1rem; }
+        .muni-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .muni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
         .muni-btn {
             background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main);
-            padding: 10px 5px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600;
-            text-align: center; transition: all 0.2s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;
+            text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .muni-btn:hover { border-color: var(--brand); color: var(--brand); transform: translateY(-2px); }
-        .muni-btn.active {
-            background: var(--brand); color: white; border-color: var(--brand);
-            box-shadow: 0 4px 10px rgba(49, 130, 206, 0.3); transform: translateY(-1px);
-        }
+        .muni-btn:hover { border-color: var(--brand); color: var(--brand); }
+        .muni-btn.active { background: var(--brand); color: white; border-color: var(--brand); transform: scale(1.02); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 
         /* BUSCADOR */
-        .search-container { max-width: 800px; margin: 1rem auto; padding: 0 1rem; position: relative; }
+        .search-container { max-width: 800px; margin: 20px auto; padding: 0 1rem; }
         #searchInput {
-            width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border);
-            background: var(--card-bg); color: var(--text-main); font-size: 1rem; transition: 0.3s;
-            outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            width: 100%; padding: 14px; border-radius: 12px; border: 2px solid var(--border);
+            background: var(--card-bg); color: var(--text-main); font-size: 1rem; outline: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        #searchInput:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2); }
+        #searchInput:focus { border-color: var(--brand); }
 
-        /* LISTA & TARJETAS (NUEVO DISEÑO) */
+        /* LISTA */
         .container { max-width: 800px; margin: 0 auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 16px; }
         
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            align-items: center; /* Alineación vertical */
-            gap: 15px;
-            overflow: hidden;
+            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+            overflow: hidden; box-shadow: var(--shadow); cursor: pointer; position: relative;
         }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-color: var(--brand); }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         
-        /* Borde indicador izquierdo (elegante) */
-        .card::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
-            background: var(--border); transition: 0.3s;
-        }
-        .card:hover::before { background: var(--brand); }
-
-        /* Estructura Interna Tarjeta */
-        .card-content { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-
-        /* Metadata Row (Zona | Puesto) */
-        .card-meta-row { display: flex; gap: 8px; flex-wrap: wrap; }
-
-        /* DISEÑO DE BADGES MEJORADO */
+        /* Layout Tarjeta */
+        .card-body { padding: 16px; display: flex; gap: 15px; align-items: center; }
+        .card-info { flex: 1; }
+        
+        /* Badges Mejorados */
+        .badges-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
         .badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 8px; border-radius: 6px;
-            font-size: 0.75rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            border: 1px solid transparent;
+            display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px;
+            font-size: 0.75rem; font-weight: 700; border: 1px solid transparent; letter-spacing: 0.5px;
         }
-        .badge span.label { opacity: 0.7; font-weight: 400; font-size: 0.7rem; margin-right: 2px; }
-
-        .badge-zona { background: var(--badge-zona-bg); color: var(--badge-zona-text); border-color: var(--badge-zona-border); }
-        .badge-puesto { background: var(--badge-puesto-bg); color: var(--badge-puesto-text); border-color: var(--badge-puesto-border); }
+        .badge-label { opacity: 0.7; font-weight: 400; margin-right: 4px; font-size: 0.7rem; }
         
-        /* Nombre Principal */
-        .card-title {
-            font-size: 1.05rem; font-weight: 700; color: var(--text-main);
-            line-height: 1.4;
+        .b-zona { background: var(--badge-zona-bg); color: var(--badge-zona-text); border-color: var(--badge-zona-border); }
+        .b-puesto { background: var(--badge-puesto-bg); color: var(--badge-puesto-text); border-color: var(--badge-puesto-border); }
+
+        .card-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: var(--text-main); margin-bottom: 8px; }
+
+        /* Mesa Box */
+        .mesa-box {
+            background: var(--primary); color: white; border-radius: 10px;
+            padding: 8px 12px; text-align: center; min-width: 75px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .mesa-label { font-size: 0.65rem; text-transform: uppercase; opacity: 0.8; }
+        .mesa-num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
+
+        /* CHECKBOX ESCRUTADO (Footer) */
+        .card-footer {
+            border-top: 1px solid var(--border);
+            padding: 10px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.02);
         }
 
-        /* Sección Derecha: MESA (El dato más importante) */
-        .card-mesa-box {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: var(--badge-mesa-bg); color: var(--badge-mesa-text);
-            border: 1px solid var(--badge-mesa-border);
-            padding: 8px 12px; border-radius: 10px;
-            min-width: 70px; text-align: center;
+        .check-container {
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            padding: 6px 12px; border-radius: 20px; transition: 0.2s;
+            user-select: none; border: 1px solid transparent;
         }
-        .mesa-label { font-size: 0.65rem; text-transform: uppercase; font-weight: 600; opacity: 0.8; margin-bottom: 2px; }
-        .mesa-val { font-size: 1.4rem; font-weight: 800; line-height: 1; }
+        .check-circle {
+            width: 20px; height: 20px; border: 2px solid var(--text-muted); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; background: var(--card-bg);
+            transition: 0.2s;
+        }
+        .check-circle i { font-size: 12px; color: white; display: none; }
+        .check-text { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
 
-        /* Puntos de Estado */
-        .indicators-row { display: flex; gap: 6px; margin-top: 4px; }
-        .dot { height: 10px; width: 10px; border-radius: 50%; }
-        .dot-red { background: var(--danger); box-shadow: 0 0 6px rgba(229, 62, 62, 0.4); animation: pulse-red 2s infinite; }
-        .dot-green { background: var(--success); box-shadow: 0 0 6px rgba(56, 161, 105, 0.4); animation: pulse-green 3s infinite; }
-        
-        @keyframes pulse-red { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes pulse-green { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+        /* Estado: Escrutado */
+        .card.is-escrutado { border-color: var(--success); background: linear-gradient(to right, var(--card-bg), var(--success-bg)); }
+        .card.is-escrutado .check-container { background: var(--success); border-color: var(--success); }
+        .card.is-escrutado .check-circle { border-color: white; background: transparent; }
+        .card.is-escrutado .check-circle i { display: block; }
+        .card.is-escrutado .check-text { color: white; }
 
-
-        /* LOADER */
-        .loader { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.9rem; }
+        /* Puntos indicadores */
+        .alert-dots { display: flex; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .bg-red { background: var(--danger); box-shadow: 0 0 5px var(--danger); animation: pulse 2s infinite; }
+        .bg-green { background: var(--success); }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
         /* MODAL */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--modal-overlay); display: none; justify-content: center; align-items: center;
-            z-index: 1000; backdrop-filter: blur(4px);
-        }
-        .modal-content {
-            background: var(--card-bg); color: var(--text-main); width: 95%; max-width: 900px; height: 90vh;
-            border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: zoomIn 0.2s ease-out;
-        }
-        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card-bg); width: 95%; max-width: 900px; height: 90vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .modal-header {
-            padding: 16px 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center;
-        }
-        .modal-header h3 { font-size: 1.1rem; font-weight: 600; }
-        .close-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; line-height: 1; }
+        .modal-header { padding: 15px 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+        
+        .info-grid { display: grid; grid-template-columns: 1fr; gap: 15px; background: rgba(0,0,0,0.03); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .alert-box { padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 4px solid; }
+        .alert-box.success { background: rgba(16, 185, 129, 0.1); border-color: var(--success); }
+        .alert-box.danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
+        .alert-title { font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.8rem; text-transform: uppercase; }
+        .alert-title.t-success { color: var(--success); } .alert-title.t-danger { color: var(--danger); }
 
-        .modal-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-
-        .info-grid {
-            display: grid; grid-template-columns: 1fr; gap: 15px;
-            background: var(--bg); padding: 20px; border-radius: 12px;
-            font-size: 0.9rem; border: 1px solid var(--border);
-        }
-        
-        .novedad-box { 
-            background: rgba(56, 161, 105, 0.1); border-left: 4px solid var(--success); 
-            padding: 10px 15px; border-radius: 0 8px 8px 0; margin-top: 10px;
-        }
-        .reclamacion-box { 
-            background: rgba(229, 62, 62, 0.1); border-left: 4px solid var(--danger); 
-            padding: 10px 15px; border-radius: 0 8px 8px 0; margin-top: 10px;
-        }
-        
-        .label-success { font-weight: 700; color: var(--success); display: block; margin-bottom: 4px; font-size: 0.8rem; text-transform: uppercase;}
-        .label-danger { font-weight: 700; color: var(--danger); display: block; margin-bottom: 4px; font-size: 0.8rem; text-transform: uppercase;}
-
-        /* TABS */
-        .tabs { display: flex; border-bottom: 2px solid var(--border); gap: 20px; }
-        .tab-btn {
-            padding: 10px 0; border: none; background: none; cursor: pointer;
-            font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; transition: 0.3s;
-            font-size: 0.95rem;
-        }
-        .tab-btn:hover { color: var(--brand); }
-        .tab-btn.active { color: var(--brand); border-bottom: 3px solid var(--brand); }
-        
-        .tab-content { display: none; flex: 1; min-height: 300px; background: #f0f2f5; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 2px solid var(--border); gap: 10px; }
+        .tab-btn { padding: 10px 15px; border: none; background: none; cursor: pointer; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
+        .tab-content { display: none; flex: 1; background: #eee; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; min-height: 400px;}
         .tab-content.active { display: block; height: 100%; }
-
-        iframe { width: 100%; height: 100%; border: none; min-height: 400px; background: white; }
-        .fallback-link { padding: 40px; text-align: center; color: var(--text-muted); }
-        .btn-link { display: inline-block; margin-top: 15px; padding: 10px 20px; background: var(--brand); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; }
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        /* Loader */
+        .loader { text-align: center; padding: 40px; color: var(--text-muted); }
 
         @media (min-width: 768px) { .info-grid { grid-template-columns: 1fr 1fr; } }
     </style>
@@ -231,61 +188,67 @@
 <body>
 
 <header>
-    <h1>🗳️ Monitor Electoral</h1>
-    <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar Tema">
-        <span id="themeIcon">🌙</span>
-    </button>
+    <h1><i class="ph ph-check-square"></i> Monitor Electoral</h1>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="ph ph-moon" id="themeIcon"></i></button>
 </header>
 
 <div class="legend-container">
-    <div class="legend-item"><span class="legend-dot bg-red"></span><span>Con Reclamación</span></div>
-    <div class="legend-item"><span class="legend-dot bg-green"></span><span>Con Novedad</span></div>
+    <div class="legend-item"><span class="legend-dot bg-red"></span> Reclamación</div>
+    <div class="legend-item"><span class="legend-dot bg-green"></span> Novedad</div>
+    <div class="legend-item" style="border-color:var(--success); color:var(--success); font-weight:bold;"><i class="ph ph-check-circle" style="margin-right:4px"></i> Escrutado</div>
 </div>
 
 <div class="municipios-container">
-    <div class="muni-title">📍 Seleccionar Municipio</div>
+    <div class="muni-title">Seleccionar Municipio</div>
     <div id="gridMunicipios" class="muni-grid"></div>
 </div>
 
 <div class="search-container">
-    <input type="text" id="searchInput" placeholder="🔍 Buscar Puesto, Mesa o Código...">
+    <input type="text" id="searchInput" placeholder="Buscar por Nombre, Puesto o Mesa...">
 </div>
 
-<div id="loading" class="loader">Seleccione un municipio para comenzar...</div>
+<div id="loading" class="loader">Seleccione un municipio para cargar datos...</div>
 <div id="listContainer" class="container"></div>
 
 <!-- MODAL -->
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Detalle de Mesa</h3>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h3>Detalles de la Mesa</h3>
+            <button class="close-btn" onclick="closeModal()"><i class="ph ph-x"></i></button>
         </div>
         <div class="modal-body">
             
             <div class="info-grid">
                 <div>
-                    <span style="font-size:0.8rem; color:var(--text-muted); display:block;">UBICACIÓN</span>
-                    <strong style="font-size:1.1rem; display:block; margin-bottom:5px;">Zona <span id="mZona"></span></strong>
-                    <span id="mPuesto" style="font-size:1rem;"></span>
+                    <span style="font-size:0.8rem; color:var(--text-muted)">UBICACIÓN</span>
+                    <div style="font-weight:700; color:var(--text-main); font-size:1.1rem">Zona <span id="mZona"></span></div>
+                    <div style="font-size:1rem; margin-top:4px;">Puesto: <strong id="mPuesto"></strong></div>
                 </div>
                 <div>
-                     <span style="font-size:0.8rem; color:var(--text-muted); display:block;">IDENTIFICADOR</span>
-                    <div style="font-size:1.5rem; font-weight:800; color:var(--brand);">MESA <span id="mMesa"></span></div>
+                    <span style="font-size:0.8rem; color:var(--text-muted)">IDENTIFICADOR</span>
+                    <div style="font-size:1.5rem; font-weight:800; color:var(--brand)">MESA <span id="mMesa"></span></div>
                 </div>
-                <div style="grid-column: 1/-1;">
+
+                <div style="grid-column: 1/-1">
                     <div id="containerNovedades">
-                        <div class="novedad-box"><span class="label-success">📝 Anotaciones Asamblea:</span><span id="novAsamblea">Ninguna</span></div>
-                        <div class="novedad-box"><span class="label-success">📝 Anotaciones Concejo:</span><span id="novConcejo">Ninguna</span></div>
+                        <div class="alert-box success">
+                            <span class="alert-title t-success">Anotaciones Asamblea</span>
+                            <span id="novAsamblea">Ninguna</span>
+                        </div>
+                        <div class="alert-box success">
+                            <span class="alert-title t-success">Anotaciones Concejo</span>
+                            <span id="novConcejo">Ninguna</span>
+                        </div>
                     </div>
-                     <div id="reclamoContainer" class="reclamacion-box" style="display:none;">
-                        <span class="label-danger">🚨 ¡Reclamación Detectada!</span>
-                        <span>Se ha adjuntado un documento de reclamación. Revise la pestaña correspondiente.</span>
+                    <div id="reclamoContainer" class="alert-box danger" style="display:none">
+                        <span class="alert-title t-danger">¡Reclamación Detectada!</span>
+                        Existe un documento de reclamación adjunto.
                     </div>
                 </div>
             </div>
 
-            <div style="flex: 1; display: flex; flex-direction: column;">
+            <div style="flex:1; display:flex; flex-direction:column;">
                 <div class="tabs">
                     <button class="tab-btn active" onclick="openTab('tabE14Concejo')">E14 Concejo</button>
                     <button class="tab-btn" onclick="openTab('tabE14Asamblea')">E14 Asamblea</button>
@@ -322,11 +285,29 @@
     ];
 
     let allData = [];
-    const LOCAL_STORAGE_KEY = 'selectedMunicipio';
+    const STORAGE_KEY_MUNI = 'selectedMunicipio';
+    const STORAGE_KEY_CHECKS = 'escrutadoStatus'; 
+
+    // Obtener estado de checks
+    function getStoredChecks() {
+        const stored = localStorage.getItem(STORAGE_KEY_CHECKS);
+        return stored ? JSON.parse(stored) : {};
+    }
+
+    // Guardar estado de checks
+    function saveCheck(id, isChecked) {
+        const checks = getStoredChecks();
+        if (isChecked) {
+            checks[id] = true;
+        } else {
+            delete checks[id];
+        }
+        localStorage.setItem(STORAGE_KEY_CHECKS, JSON.stringify(checks));
+    }
 
     function initMunicipios() {
         const grid = document.getElementById('gridMunicipios');
-        const savedMuniName = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const savedMuniName = localStorage.getItem(STORAGE_KEY_MUNI);
         let targetMuni = municipios[0];
         let targetIndex = 0;
 
@@ -355,7 +336,7 @@
     async function loadMunicipioData(muniObj, btnElement) {
         document.querySelectorAll('.muni-btn').forEach(b => b.classList.remove('active'));
         if(btnElement) btnElement.classList.add('active');
-        localStorage.setItem(LOCAL_STORAGE_KEY, muniObj.name);
+        localStorage.setItem(STORAGE_KEY_MUNI, muniObj.name);
 
         document.getElementById('listContainer').innerHTML = '';
         document.getElementById('loading').style.display = 'block';
@@ -377,7 +358,7 @@
             renderList(allData);
             document.getElementById('loading').style.display = 'none';
         } catch (error) {
-            document.getElementById('loading').innerHTML = `Error cargando ${muniObj.name}. Intente de nuevo.`;
+            document.getElementById('loading').innerHTML = `Error cargando. Intente de nuevo.`;
         }
     }
 
@@ -403,76 +384,124 @@
         return rows;
     }
 
+    // --- RENDER LIST ---
     function renderList(data) {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
+        const savedChecks = getStoredChecks();
+
         if(data.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">No hay registros.</div>';
+            container.innerHTML = '<div style="text-align:center; padding:20px;">No hay registros.</div>';
             return;
         }
 
         data.forEach((item) => {
+            // ID Único: Codigo + Mesa (Evita conflictos si hay misma mesa en otro colegio)
+            const uniqueId = (item.codigo || item.nombre) + '-' + item.mesa;
+            const isEscrutado = savedChecks[uniqueId] ? true : false;
+
             const hasReclamacion = (item.linkReclamacion && item.linkReclamacion.length > 5);
             const hasNovedades = (item.novAsamblea && item.novAsamblea.trim() !== '') || (item.novConcejo && item.novConcejo.trim() !== '');
 
             const card = document.createElement('div');
-            card.className = 'card';
-            
-            let indicatorsHtml = '<div class="indicators-row">';
-            if (hasReclamacion) indicatorsHtml += `<span class="dot dot-red" title="Reclamación"></span>`;
-            if (hasNovedades) indicatorsHtml += `<span class="dot dot-green" title="Anotaciones"></span>`;
-            indicatorsHtml += '</div>';
+            card.className = `card ${isEscrutado ? 'is-escrutado' : ''}`;
+            card.onclick = () => openModal(item);
 
-            // Nuevo Diseño de Tarjeta Profesional
+            // Alerta visual puntos
+            let alerts = '';
+            if (hasReclamacion) alerts += '<span class="dot bg-red" title="Reclamación"></span>';
+            if (hasNovedades) alerts += '<span class="dot bg-green" title="Novedad"></span>';
+
             card.innerHTML = `
-                <div class="card-content">
-                    <div class="card-meta-row">
-                        <span class="badge badge-zona"><span class="label">ZONA</span> ${item.zona}</span>
-                        <span class="badge badge-puesto"><span class="label">PUESTO</span> ${item.puesto}</span>
+                <div class="card-body">
+                    <div class="card-info">
+                        <div class="badges-row">
+                            <span class="badge b-zona"><span class="badge-label">ZONA</span> ${item.zona}</span>
+                            <span class="badge b-puesto"><span class="badge-label">PUESTO</span> ${item.puesto}</span>
+                        </div>
+                        <div class="card-title">${item.nombre}</div>
+                        <div class="alert-dots">${alerts}</div>
                     </div>
-                    <div class="card-title">${item.nombre}</div>
-                    ${indicatorsHtml}
+                    
+                    <div class="mesa-box">
+                        <span class="mesa-label">MESA</span>
+                        <span class="mesa-num">${item.mesa}</span>
+                    </div>
                 </div>
-                
-                <div class="card-mesa-box">
-                    <span class="mesa-label">MESA</span>
-                    <span class="mesa-val">${item.mesa}</span>
+
+                <!-- Footer Checkbox -->
+                <div class="card-footer">
+                    <small style="color:var(--text-muted)">Detalles &rarr;</small>
+                    
+                    <div class="check-container" onclick="toggleEscrutado(event, '${uniqueId}', this)">
+                        <div class="check-text">${isEscrutado ? 'ESCRUTADO' : 'Marcar como Escrutado'}</div>
+                        <div class="check-circle">
+                            <i class="ph ph-check" style="font-weight:bold;"></i>
+                        </div>
+                    </div>
                 </div>
             `;
-            card.onclick = () => openModal(item);
             container.appendChild(card);
         });
     }
 
+    // Toggle Check Logic
+    window.toggleEscrutado = function(event, id, btnElement) {
+        event.stopPropagation(); // Detener que se abra el modal
+        event.stopImmediatePropagation();
+
+        const card = btnElement.closest('.card');
+        const textEl = btnElement.querySelector('.check-text');
+        
+        // Determinar estado actual basado en clase visual (source of truth is UI for instant feedback)
+        const currentlyEscrutado = card.classList.contains('is-escrutado');
+        const newState = !currentlyEscrutado;
+
+        // Actualizar UI
+        if (newState) {
+            card.classList.add('is-escrutado');
+            textEl.innerText = "ESCRUTADO";
+        } else {
+            card.classList.remove('is-escrutado');
+            textEl.innerText = "Marcar como Escrutado";
+        }
+
+        // Guardar Storage
+        saveCheck(id, newState);
+    }
+
+    // --- FILTRO ---
     document.getElementById('searchInput').addEventListener('keyup', (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = allData.filter(item => 
             (item.puesto && item.puesto.toLowerCase().includes(term)) ||
             (item.nombre && item.nombre.toLowerCase().includes(term)) ||
-            (item.mesa && item.mesa.includes(term)) ||
-            (item.codigo && item.codigo.toLowerCase().includes(term))
+            (item.mesa && item.mesa.includes(term))
         );
         renderList(filtered);
     });
 
+    // --- THEME ---
     function toggleTheme() {
         const body = document.body;
         const icon = document.getElementById('themeIcon');
         if (body.getAttribute('data-theme') === 'dark') {
             body.removeAttribute('data-theme');
-            icon.innerText = '🌙';
+            icon.classList.remove('ph-sun'); icon.classList.add('ph-moon');
             localStorage.setItem('theme', 'light');
         } else {
             body.setAttribute('data-theme', 'dark');
-            icon.innerText = '☀️';
+            icon.classList.remove('ph-moon'); icon.classList.add('ph-sun');
             localStorage.setItem('theme', 'dark');
         }
     }
     if (localStorage.getItem('theme') === 'dark') {
         document.body.setAttribute('data-theme', 'dark');
-        document.getElementById('themeIcon').innerText = '☀️';
+        document.getElementById('themeIcon').classList.remove('ph-moon');
+        document.getElementById('themeIcon').classList.add('ph-sun');
     }
 
+    // --- MODAL HELPERS ---
     function getEmbedLink(link) {
         if (!link) return null;
         try {
@@ -486,14 +515,11 @@
         const container = document.getElementById(containerId);
         container.innerHTML = ''; 
         if (!originalLink || originalLink.length < 5) {
-            container.innerHTML = '<div class="fallback-link"><p>Documento no disponible</p></div>';
+            container.innerHTML = '<div style="padding:40px; text-align:center; color:#999">Documento no disponible</div>';
             return;
         }
         const embedUrl = getEmbedLink(originalLink);
-        const fallback = `
-            <div style="background:var(--bg); padding:10px; text-align:center; border-bottom:1px solid var(--border);">
-                ¿No carga? <a href="${originalLink}" target="_blank" style="color:var(--brand); font-weight:bold;">Abrir en pestaña nueva</a>
-            </div>`;
+        const fallback = `<div style="padding:10px; text-align:center; border-bottom:1px solid #ddd; font-size:0.9rem">¿No carga? <a href="${originalLink}" target="_blank" style="color:var(--brand); font-weight:bold">Abrir en nueva pestaña</a></div>`;
         const iframe = document.createElement('iframe');
         iframe.src = embedUrl;
         container.innerHTML = fallback;
@@ -501,7 +527,6 @@
     }
 
     function openModal(item) {
-        document.getElementById('modalTitle').innerText = item.nombre;
         document.getElementById('mZona').innerText = item.zona || '-';
         document.getElementById('mPuesto').innerText = item.puesto || '-';
         document.getElementById('mMesa').innerText = item.mesa || '-';
