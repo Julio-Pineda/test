@@ -228,7 +228,7 @@
 </div>
 
 <script>
-    // --- DATOS DE MUNICIPIOS EXTRAÍDOS ---
+    // --- DATOS DE MUNICIPIOS ---
     const municipios = [
         { name: "POPAYAN", url: "https://docs.google.com/spreadsheets/d/1-Pmx3R9MD0MvtkSGHiKlOCsmmhjNtWCdWRy9NyfIshY/edit?usp=drive_link" },
         { name: "CAJIBIO", url: "https://docs.google.com/spreadsheets/d/1D4xh8f-n2UmrdC-fGH6E3gtL8j7ycTFbEb5wnkI-VzQ/edit?usp=drive_link" },
@@ -251,13 +251,18 @@
     ];
 
     let allData = [];
-    let currentSheetUrl = "";
+    const LOCAL_STORAGE_KEY = 'selectedMunicipio';
 
     // --- FUNCIONES CORE ---
 
-    // 1. Inicializar Botonera
+    // 1. Inicializar Botonera con Memoria
     function initMunicipios() {
         const grid = document.getElementById('gridMunicipios');
+        const savedMuniName = localStorage.getItem(LOCAL_STORAGE_KEY);
+        
+        let targetMuni = municipios[0]; // Por defecto: Popayán
+        let targetIndex = 0;
+
         municipios.forEach((muni, index) => {
             const btn = document.createElement('div');
             btn.className = 'muni-btn';
@@ -265,15 +270,23 @@
             btn.onclick = () => loadMunicipioData(muni, btn);
             grid.appendChild(btn);
             
-            // Cargar el primero por defecto (Popayan)
-            if (index === 0) loadMunicipioData(muni, btn);
+            // Si el nombre coincide con el guardado, lo marcamos como objetivo
+            if (savedMuniName && muni.name === savedMuniName) {
+                targetMuni = muni;
+                targetIndex = index;
+            }
         });
+
+        // Cargar el objetivo (ya sea el guardado o el default)
+        const allBtns = grid.children;
+        if(allBtns[targetIndex]) {
+            loadMunicipioData(targetMuni, allBtns[targetIndex]);
+        }
     }
 
-    // 2. Transformar URL (Edit -> Export CSV)
+    // 2. Helper URL
     function getCsvUrl(driveUrl) {
         try {
-            // Extraer ID
             const id = driveUrl.split('/d/')[1].split('/')[0];
             return `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`;
         } catch (e) {
@@ -282,12 +295,15 @@
         }
     }
 
-    // 3. Cargar Datos
+    // 3. Cargar Datos + Guardar Selección
     async function loadMunicipioData(muniObj, btnElement) {
         // UI Updates
         document.querySelectorAll('.muni-btn').forEach(b => b.classList.remove('active'));
         if(btnElement) btnElement.classList.add('active');
         
+        // Guardar selección en LocalStorage
+        localStorage.setItem(LOCAL_STORAGE_KEY, muniObj.name);
+
         document.getElementById('listContainer').innerHTML = '';
         document.getElementById('loading').style.display = 'block';
         document.getElementById('loading').innerText = `Cargando datos de ${muniObj.name}...`;
@@ -300,7 +316,6 @@
             const text = await response.text();
             const rawRows = parseCSV(text);
             
-            // Mapeo: 0:Codigo, 1:Zona, 2:Puesto, 3:Mesa, 4:Nombre, 5:LinkC, 6:LinkA, 7:LinkR, 8:NovA, 9:NovC
             allData = rawRows.slice(1).map(r => ({
                 codigo: r[0], zona: r[1], puesto: r[2], mesa: r[3], nombre: r[4],
                 linkConcejo: r[5], linkAsamblea: r[6], linkReclamacion: r[7],
@@ -316,8 +331,7 @@
         }
     }
 
-    // --- LÓGICA GENERAL (Igual que antes) ---
-
+    // --- LÓGICA GENERAL ---
     function parseCSV(text) {
         const rows = []; let currentRow = []; let currentVal = ''; let inQuotes = false;
         for (let i = 0; i < text.length; i++) {
@@ -387,7 +401,7 @@
         renderList(filtered);
     });
 
-    // --- MANEJO DE MODO OSCURO ---
+    // --- TEMA Y MODAL ---
     function toggleTheme() {
         const body = document.body;
         const icon = document.getElementById('themeIcon');
@@ -406,7 +420,6 @@
         document.getElementById('themeIcon').innerText = '☀️';
     }
 
-    // --- MODAL Y PDF HELPERS ---
     function getEmbedLink(link) {
         if (!link) return null;
         try {
