@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitor Electoral Final</title>
-    <!-- Iconos Phosphor (Más ligeros y bonitos que FontAwesome) -->
+    <!-- Iconos Phosphor -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         /* --- VARIABLES --- */
@@ -15,16 +15,14 @@
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border: #e5e7eb;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --modal-overlay: rgba(0,0,0,0.6);
 
-            /* Colores Semánticos */
-            --brand: #3b82f6; /* Azul moderno */
+            --brand: #3b82f6; 
             --danger: #ef4444;
             --success: #10b981;
             --success-bg: #d1fae5;
             
-            /* Badges */
             --badge-zona-bg: #fff7ed; --badge-zona-text: #9a3412; --badge-zona-border: #fed7aa;
             --badge-puesto-bg: #eff6ff; --badge-puesto-text: #1e40af; --badge-puesto-border: #bfdbfe;
         }
@@ -85,33 +83,57 @@
         }
         #searchInput:focus { border-color: var(--brand); }
 
-        /* LISTA */
-        .container { max-width: 800px; margin: 0 auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 16px; }
+        /* ESTILOS DE ACORDEON (NUEVO) */
+        .group-container { margin-bottom: 15px; }
+        
+        .group-header {
+            background: var(--card-bg); border: 1px solid var(--border);
+            padding: 12px 16px; border-radius: 8px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 700; color: var(--text-main); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-bottom: 5px; user-select: none;
+        }
+        .group-header:hover { background-color: rgba(0,0,0,0.02); border-color: var(--brand); }
+        .group-header i { transition: transform 0.3s; }
+        .group-header.active i { transform: rotate(180deg); }
+        
+        .group-content { display: none; padding: 10px 0; animation: fadeIn 0.3s; }
+        .group-content.open { display: block; }
+        
+        /* Estilos Específicos ZONA vs PUESTO */
+        .header-zona { border-left: 5px solid var(--brand); font-size: 1.1rem; }
+        .header-puesto { border-left: 5px solid var(--text-muted); margin-left: 5px; font-size: 1rem; }
+        
+        /* Indentación para jerarquía */
+        .zone-wrapper .group-content { padding-left: 10px; border-left: 2px solid var(--border); margin-left: 10px; }
+        .puesto-grid { display: grid; grid-template-columns: 1fr; gap: 10px; } /* Grid para las cartas dentro del puesto */
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* TARJETAS (CARDS) */
+        .container { max-width: 800px; margin: 0 auto; padding: 0 1rem; }
         
         .card {
             background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
             overflow: hidden; box-shadow: var(--shadow); cursor: pointer; position: relative;
+            margin-bottom: 8px; /* Espacio entre cartas */
         }
         .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         
-        /* Layout Tarjeta */
         .card-body { padding: 16px; display: flex; gap: 15px; align-items: center; }
         .card-info { flex: 1; }
         
-        /* Badges Mejorados */
         .badges-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
         .badge {
             display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px;
             font-size: 0.75rem; font-weight: 700; border: 1px solid transparent; letter-spacing: 0.5px;
         }
         .badge-label { opacity: 0.7; font-weight: 400; margin-right: 4px; font-size: 0.7rem; }
-        
         .b-zona { background: var(--badge-zona-bg); color: var(--badge-zona-text); border-color: var(--badge-zona-border); }
         .b-puesto { background: var(--badge-puesto-bg); color: var(--badge-puesto-text); border-color: var(--badge-puesto-border); }
 
         .card-title { font-size: 1.1rem; font-weight: 700; line-height: 1.3; color: var(--text-main); margin-bottom: 8px; }
 
-        /* Mesa Box */
         .mesa-box {
             background: var(--primary); color: white; border-radius: 10px;
             padding: 8px 12px; text-align: center; min-width: 75px;
@@ -120,14 +142,11 @@
         .mesa-label { font-size: 0.65rem; text-transform: uppercase; opacity: 0.8; }
         .mesa-num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
 
-        /* CHECKBOX ESCRUTADO (Footer) */
         .card-footer {
-            border-top: 1px solid var(--border);
-            padding: 10px 16px;
+            border-top: 1px solid var(--border); padding: 10px 16px;
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.02);
         }
-
         .check-container {
             display: flex; align-items: center; gap: 8px; cursor: pointer;
             padding: 6px 12px; border-radius: 20px; transition: 0.2s;
@@ -171,7 +190,6 @@
         .alert-title { font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.8rem; text-transform: uppercase; }
         .alert-title.t-success { color: var(--success); } .alert-title.t-danger { color: var(--danger); }
 
-        /* Tabs */
         .tabs { display: flex; border-bottom: 2px solid var(--border); gap: 10px; }
         .tab-btn { padding: 10px 15px; border: none; background: none; cursor: pointer; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; }
         .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
@@ -179,7 +197,6 @@
         .tab-content.active { display: block; height: 100%; }
         iframe { width: 100%; height: 100%; border: none; }
         
-        /* Loader */
         .loader { text-align: center; padding: 40px; color: var(--text-muted); }
 
         @media (min-width: 768px) { .info-grid { grid-template-columns: 1fr 1fr; } }
@@ -288,20 +305,14 @@
     const STORAGE_KEY_MUNI = 'selectedMunicipio';
     const STORAGE_KEY_CHECKS = 'escrutadoStatus'; 
 
-    // Obtener estado de checks
     function getStoredChecks() {
         const stored = localStorage.getItem(STORAGE_KEY_CHECKS);
         return stored ? JSON.parse(stored) : {};
     }
 
-    // Guardar estado de checks
     function saveCheck(id, isChecked) {
         const checks = getStoredChecks();
-        if (isChecked) {
-            checks[id] = true;
-        } else {
-            delete checks[id];
-        }
+        if (isChecked) { checks[id] = true; } else { delete checks[id]; }
         localStorage.setItem(STORAGE_KEY_CHECKS, JSON.stringify(checks));
     }
 
@@ -384,8 +395,8 @@
         return rows;
     }
 
-    // --- RENDER LIST ---
-    function renderList(data) {
+    // --- NUEVA FUNCIÓN RENDER CON AGRUPAMIENTO ---
+    function renderList(data, expandAll = false) {
         const container = document.getElementById('listContainer');
         container.innerHTML = '';
         const savedChecks = getStoredChecks();
@@ -395,82 +406,120 @@
             return;
         }
 
-        data.forEach((item) => {
-            // ID Único: Codigo + Mesa (Evita conflictos si hay misma mesa en otro colegio)
+        // Obtener Zonas Únicas
+        const uniqueZones = [...new Set(data.map(i => i.zona).filter(z => z))].sort();
+        const hasMultipleZones = uniqueZones.length > 1;
+
+        // Función auxiliar para crear cartas
+        const createCard = (item) => {
             const uniqueId = (item.codigo || item.nombre) + '-' + item.mesa;
             const isEscrutado = savedChecks[uniqueId] ? true : false;
-
             const hasReclamacion = (item.linkReclamacion && item.linkReclamacion.length > 5);
             const hasNovedades = (item.novAsamblea && item.novAsamblea.trim() !== '') || (item.novConcejo && item.novConcejo.trim() !== '');
 
-            const card = document.createElement('div');
-            card.className = `card ${isEscrutado ? 'is-escrutado' : ''}`;
-            card.onclick = () => openModal(item);
-
-            // Alerta visual puntos
             let alerts = '';
             if (hasReclamacion) alerts += '<span class="dot bg-red" title="Reclamación"></span>';
             if (hasNovedades) alerts += '<span class="dot bg-green" title="Novedad"></span>';
 
-            card.innerHTML = `
+            const div = document.createElement('div');
+            div.className = `card ${isEscrutado ? 'is-escrutado' : ''}`;
+            div.onclick = () => openModal(item);
+            div.innerHTML = `
                 <div class="card-body">
                     <div class="card-info">
-                        <div class="badges-row">
-                            <span class="badge b-zona"><span class="badge-label">ZONA</span> ${item.zona}</span>
-                            <span class="badge b-puesto"><span class="badge-label">PUESTO</span> ${item.puesto}</span>
-                        </div>
                         <div class="card-title">${item.nombre}</div>
                         <div class="alert-dots">${alerts}</div>
                     </div>
-                    
                     <div class="mesa-box">
                         <span class="mesa-label">MESA</span>
                         <span class="mesa-num">${item.mesa}</span>
                     </div>
                 </div>
-
-                <!-- Footer Checkbox -->
                 <div class="card-footer">
                     <small style="color:var(--text-muted)">Detalles &rarr;</small>
-                    
                     <div class="check-container" onclick="toggleEscrutado(event, '${uniqueId}', this)">
-                        <div class="check-text">${isEscrutado ? 'ESCRUTADO' : 'Marcar como Escrutado'}</div>
-                        <div class="check-circle">
-                            <i class="ph ph-check" style="font-weight:bold;"></i>
-                        </div>
+                        <div class="check-text">${isEscrutado ? 'ESCRUTADO' : 'Marcar'}</div>
+                        <div class="check-circle"><i class="ph ph-check" style="font-weight:bold;"></i></div>
                     </div>
                 </div>
             `;
-            container.appendChild(card);
-        });
+            return div;
+        };
+
+        // Función auxiliar para acordeones
+        const createAccordion = (title, levelClass, contentElements, isOpen) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'group-wrapper';
+            
+            const header = document.createElement('div');
+            header.className = `group-header ${levelClass} ${isOpen ? 'active' : ''}`;
+            header.innerHTML = `<span>${title} <small style="font-weight:400; opacity:0.7">(${contentElements.length})</small></span> <i class="ph ph-caret-down"></i>`;
+            
+            const content = document.createElement('div');
+            content.className = `group-content ${isOpen ? 'open' : ''}`;
+            if(levelClass === 'header-puesto') content.className += ' puesto-grid'; // Grid solo para mesas
+
+            contentElements.forEach(el => content.appendChild(el));
+
+            header.onclick = () => {
+                header.classList.toggle('active');
+                content.classList.toggle('open');
+            };
+
+            wrapper.appendChild(header);
+            wrapper.appendChild(content);
+            return wrapper;
+        };
+
+        // Lógica de Renderizado por Niveles
+        if (hasMultipleZones) {
+            // NIVEL 1: ZONAS
+            uniqueZones.forEach(zona => {
+                const zoneItems = data.filter(d => d.zona === zona);
+                
+                // Agrupar por Puestos dentro de la Zona
+                const uniquePuestos = [...new Set(zoneItems.map(i => i.puesto))].sort();
+                const puestoAccordions = [];
+
+                uniquePuestos.forEach(puesto => {
+                    const puestoItems = zoneItems.filter(d => d.puesto === puesto);
+                    const cards = puestoItems.map(createCard);
+                    puestoAccordions.push(createAccordion(puesto, 'header-puesto', cards, expandAll));
+                });
+
+                const zonaAccordion = createAccordion(`ZONA ${zona}`, 'header-zona', puestoAccordions, expandAll);
+                zonaAccordion.classList.add('zone-wrapper'); // Para indentación
+                container.appendChild(zonaAccordion);
+            });
+        } else {
+            // NIVEL: SOLO PUESTOS (Sin Zona Header)
+            const uniquePuestos = [...new Set(data.map(i => i.puesto))].sort();
+            uniquePuestos.forEach(puesto => {
+                const puestoItems = data.filter(d => d.puesto === puesto);
+                const cards = puestoItems.map(createCard);
+                container.appendChild(createAccordion(puesto, 'header-puesto', cards, expandAll));
+            });
+        }
     }
 
-    // Toggle Check Logic
     window.toggleEscrutado = function(event, id, btnElement) {
-        event.stopPropagation(); // Detener que se abra el modal
-        event.stopImmediatePropagation();
-
+        event.stopPropagation(); event.stopImmediatePropagation();
         const card = btnElement.closest('.card');
         const textEl = btnElement.querySelector('.check-text');
-        
-        // Determinar estado actual basado en clase visual (source of truth is UI for instant feedback)
         const currentlyEscrutado = card.classList.contains('is-escrutado');
         const newState = !currentlyEscrutado;
 
-        // Actualizar UI
         if (newState) {
             card.classList.add('is-escrutado');
             textEl.innerText = "ESCRUTADO";
         } else {
             card.classList.remove('is-escrutado');
-            textEl.innerText = "Marcar como Escrutado";
+            textEl.innerText = "Marcar";
         }
-
-        // Guardar Storage
         saveCheck(id, newState);
     }
 
-    // --- FILTRO ---
+    // --- FILTRO ACTUALIZADO ---
     document.getElementById('searchInput').addEventListener('keyup', (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = allData.filter(item => 
@@ -478,10 +527,10 @@
             (item.nombre && item.nombre.toLowerCase().includes(term)) ||
             (item.mesa && item.mesa.includes(term))
         );
-        renderList(filtered);
+        // Si hay búsqueda, pasamos true para expandir todo
+        renderList(filtered, term.length > 0);
     });
 
-    // --- THEME ---
     function toggleTheme() {
         const body = document.body;
         const icon = document.getElementById('themeIcon');
@@ -501,7 +550,6 @@
         document.getElementById('themeIcon').classList.add('ph-sun');
     }
 
-    // --- MODAL HELPERS ---
     function getEmbedLink(link) {
         if (!link) return null;
         try {
