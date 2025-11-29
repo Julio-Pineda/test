@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Análisis Electoral</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Three.js para el fondo 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-glass: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --brand: #60a5fa;
+            --success: #34d399;
+            --danger: #f87171;
+            --border: rgba(255,255,255,0.1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Three.js Background Canvas */
+        #bgCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.6; pointer-events: none;
+        }
+
+        .navbar {
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .btn-back {
+            color: white; text-decoration: none; display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 20px; background: rgba(255,255,255,0.1); transition: 0.3s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.2); }
+
+        .dashboard {
+            max-width: 1200px; margin: 20px auto; padding: 0 1rem;
+            display: grid; gap: 20px;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;
+        }
+        .glass-card {
+            background: var(--card-glass);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .kpi-title { font-size: 0.8rem; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; }
+        .kpi-value { font-size: 2.5rem; font-weight: 800; margin: 5px 0; background: linear-gradient(45deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+        .kpi-sub { font-size: 0.9rem; }
+        .t-success { color: var(--success); }
+        .t-danger { color: var(--danger); }
+        .t-brand { color: var(--brand); }
+
+        /* Charts Layout */
+        .charts-row { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media(min-width: 900px) { .charts-row { grid-template-columns: 1fr 2fr; } }
+
+        .chart-container { position: relative; height: 300px; width: 100%; display: flex; align-items: center; justify-content: center;}
+        
+        h2 { margin-bottom: 15px; font-weight: 300; border-left: 4px solid var(--brand); padding-left: 10px; }
+
+        /* Loading Overlay */
+        #loader {
+            position: fixed; inset: 0; background: var(--bg-dark); z-index: 200;
+            display: flex; justify-content: center; align-items: center; font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fondo 3D -->
+<canvas id="bgCanvas"></canvas>
+
+<div id="loader">Conectando satélite...</div>
+
+<nav class="navbar">
+    <a href="index.html" class="btn-back"><i class="ph ph-arrow-left"></i> Volver</a>
+    <div style="text-align: right;">
+        <div style="font-size:0.8rem; color:#94a3b8">ANÁLISIS EN TIEMPO REAL</div>
+        <div style="font-weight:700; font-size:1.1rem" id="muniName">CARGANDO...</div>
+    </div>
+</nav>
+
+<div class="dashboard">
+    <!-- KPIS -->
+    <div class="kpi-grid">
+        <div class="glass-card">
+            <div class="kpi-title">Avance Escrutinio</div>
+            <div class="kpi-value" id="kpiEscrutado">0%</div>
+            <div class="kpi-sub"><span id="txtMesasEsc">0</span> de <span id="txtMesasTot">0</span> Mesas</div>
+        </div>
+        <div class="glass-card">
+            <div class="kpi-title">Reclamaciones</div>
+            <div class="kpi-value t-danger" id="kpiReclamos">0</div>
+            <div class="kpi-sub">Mesas con impugnaciones</div>
+        </div>
+        <div class="glass-card">
+            <div class="kpi-title">Novedades</div>
+            <div class="kpi-value t-success" id="kpiNovedades">0</div>
+            <div class="kpi-sub">Reportes en E-14</div>
+        </div>
+        <div class="glass-card">
+            <div class="kpi-title">Faltantes</div>
+            <div class="kpi-value t-brand" id="kpiFaltantes">0</div>
+            <div class="kpi-sub">Mesas por procesar</div>
+        </div>
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="charts-row">
+        <!-- Dona de Progreso -->
+        <div class="glass-card">
+            <h2>Progreso Global</h2>
+            <div class="chart-container">
+                <canvas id="doughnutChart"></canvas>
+            </div>
+        </div>
+        <!-- Barras de Reclamaciones -->
+        <div class="glass-card">
+            <h2>Reclamaciones por Zona/Puesto</h2>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURACIÓN (Misma que index.html) ---
+    const municipios = [
+        { name: "POPAYAN", url: "https://docs.google.com/spreadsheets/d/1-Pmx3R9MD0MvtkSGHiKlOCsmmhjNtWCdWRy9NyfIshY/edit?usp=drive_link" },
+        { name: "CAJIBIO", url: "https://docs.google.com/spreadsheets/d/1D4xh8f-n2UmrdC-fGH6E3gtL8j7ycTFbEb5wnkI-VzQ/edit?usp=drive_link" },
+        { name: "CALOTO", url: "https://docs.google.com/spreadsheets/d/195-zmz4c7HbGn0ngBaL4yDUJ-lR4DA69hkywy2InCbE/edit?usp=drive_link" },
+        { name: "CORINTO", url: "https://docs.google.com/spreadsheets/d/1kZofOxvM7VKotXS5JW4xB0-B9c_utM0sAiZq6y-FhtM/edit?usp=drive_link" },
+        { name: "EL TAMBO", url: "https://docs.google.com/spreadsheets/d/1DIwcx_j6VHTeRBIdn4EKAR-rBTBOlQ7ePt3Zy6AIYaU/edit?usp=drive_link" },
+        { name: "GUACHENE", url: "https://docs.google.com/spreadsheets/d/1ytmK4aX6rVJVbtGQKtxBHUt2cQm93fH560Kw08A35Qs/edit?usp=drive_link" },
+        { name: "LA SIERRA", url: "https://docs.google.com/spreadsheets/d/19wbJPPcvSEq6I6AAX850QjZGO44DLaZyedMZGQGjKAg/edit?usp=drive_link" },
+        { name: "MERCADERES", url: "https://docs.google.com/spreadsheets/d/1rbzqJDePpYAaw1_-WnGdbEAxoIY_1QO3nsMWp8nirPY/edit?usp=drive_link" },
+        { name: "MIRANDA", url: "https://docs.google.com/spreadsheets/d/1ViRjM0fTcNmg5piYUxS12bHst6a2EExlI-0aTtOL59I/edit?usp=drive_link" },
+        { name: "MORALES", url: "https://docs.google.com/spreadsheets/d/1x1UHjJyqsF8KCdRtFXNnnEjqwPvCXBvIteCU8oCVX-Y/edit?usp=drive_link" },
+        { name: "PATIA (BORDO)", url: "https://docs.google.com/spreadsheets/d/15I-sFAN8vCdjjAgvU1-KYgEuLO0PoYZSCehLbpbGoSk/edit?usp=drive_link" },
+        { name: "PIENDAMO", url: "https://docs.google.com/spreadsheets/d/12FzAJJ1AUfj0M4hb3vKYYMyHa617pXn-Y7f-qHCcnsw/edit?usp=drive_link" },
+        { name: "PUERTO TEJADA", url: "https://docs.google.com/spreadsheets/d/1dD38hBH5LrTjaor4sN66H2rbxLjqQfUdeYMrn8Muo4o/edit?usp=drive_link" },
+        { name: "ROSAS", url: "https://docs.google.com/spreadsheets/d/1aZnMfa_aQCgrTkmL38F3b_q4K-FmsDTu2E-4hT7cJDs/edit?usp=drive_link" },
+        { name: "SANTANDER", url: "https://docs.google.com/spreadsheets/d/1J9RydTcOo7KYptiojLvyoAhTvm1NbDjgzevlIOO6-S4/edit?usp=drive_link" },
+        { name: "SUCRE", url: "https://docs.google.com/spreadsheets/d/1tcCb721Fm18l7H3Hi1bizmjbjAPEJ5IpsYIm1iO-zDM/edit?usp=drive_link" },
+        { name: "TIMBIO", url: "https://docs.google.com/spreadsheets/d/1epDUpM6Ocw-R_3CggSfzgZILq2c7C2cueBArXKG6emQ/edit?usp=drive_link" },
+        { name: "VILLA RICA", url: "https://docs.google.com/spreadsheets/d/1IJugGUsq5TJoTP79O8yvcHHi6yMeHLoG8tDEP7PmYJA/edit?usp=drive_link" }
+    ];
+
+    // --- 2. CARGA DE DATOS ---
+    async function initStats() {
+        const storedMuni = localStorage.getItem('selectedMunicipio');
+        const muniObj = municipios.find(m => m.name === storedMuni) || municipios[0];
+        document.getElementById('muniName').innerText = muniObj.name;
+
+        // Fetch CSV
+        const csvUrl = muniObj.url.includes('/d/') 
+            ? `https://docs.google.com/spreadsheets/d/${muniObj.url.split('/d/')[1].split('/')[0]}/export?format=csv`
+            : null;
+
+        if(!csvUrl) return;
+
+        try {
+            const resp = await fetch(csvUrl);
+            const text = await resp.text();
+            const rows = parseCSV(text).slice(1).map(r => ({
+                zona: r[1], puesto: r[2], mesa: r[3],
+                linkReclamacion: r[7], novAsamblea: r[8], novConcejo: r[9],
+                uniqueId: (r[0] || r[4]) + '-' + r[3]
+            })).filter(i => i.mesa);
+
+            calculateAndRender(rows);
+            document.getElementById('loader').style.display = 'none';
+        } catch(e) {
+            console.error(e);
+            document.getElementById('loader').innerText = "Error cargando datos.";
+        }
+    }
+
+    function parseCSV(text) {
+        // Simple Parser (igual que index.html)
+        const rows = []; let currentRow = []; let currentVal = ''; let inQuotes = false;
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (char === '"') { inQuotes = !inQuotes; }
+            else if (char === ',' && !inQuotes) { currentRow.push(currentVal.trim()); currentVal = ''; }
+            else if ((char === '\n' || char === '\r') && !inQuotes) {
+                if (currentVal || currentRow.length > 0) currentRow.push(currentVal.trim());
+                if (currentRow.length) rows.push(currentRow);
+                currentRow = []; currentVal = '';
+            } else { currentVal += char; }
+        }
+        return rows;
+    }
+
+    // --- 3. CÁLCULOS Y RENDERIZADO ---
+    function calculateAndRender(data) {
+        const storedChecks = JSON.parse(localStorage.getItem('escrutadoStatus') || '{}');
+        
+        // 1. Cálculos Básicos
+        const totalMesas = data.length;
+        const escrutadas = data.filter(d => storedChecks[d.uniqueId]).length;
+        const faltantes = totalMesas - escrutadas;
+        const porcentaje = totalMesas > 0 ? Math.round((escrutadas / totalMesas) * 100) : 0;
+        
+        const reclamos = data.filter(d => d.linkReclamacion && d.linkReclamacion.length > 5).length;
+        const novedades = data.filter(d => (d.novAsamblea && d.novAsamblea.length > 1) || (d.novConcejo && d.novConcejo.length > 1)).length;
+
+        // Update DOM
+        document.getElementById('kpiEscrutado').innerText = porcentaje + '%';
+        document.getElementById('txtMesasEsc').innerText = escrutadas;
+        document.getElementById('txtMesasTot').innerText = totalMesas;
+        document.getElementById('kpiReclamos').innerText = reclamos;
+        document.getElementById('kpiNovedades').innerText = novedades;
+        document.getElementById('kpiFaltantes').innerText = faltantes;
+
+        // 2. Gráficos
+        renderDoughnut(escrutadas, faltantes);
+        renderBarChart(data);
+    }
+
+    function renderDoughnut(done, missing) {
+        const ctx = document.getElementById('doughnutChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Escrutado', 'Pendiente'],
+                datasets: [{
+                    data: [done, missing],
+                    backgroundColor: ['#3b82f6', '#1e293b'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+
+    function renderBarChart(data) {
+        // Agrupar reclamaciones por Zona (o Puesto si es 1 sola zona)
+        const counts = {};
+        data.forEach(d => {
+            if(d.linkReclamacion && d.linkReclamacion.length > 5) {
+                const key = d.zona ? `Zona ${d.zona}` : d.puesto;
+                counts[key] = (counts[key] || 0) + 1;
+            }
+        });
+
+        const labels = Object.keys(counts);
+        const values = Object.values(counts);
+
+        const ctx = document.getElementById('barChart').getContext('2d');
+        if(labels.length === 0) {
+            // Placeholder si no hay reclamos
+            document.getElementById('barChart').style.display = 'none';
+            document.querySelector('#barChart').parentNode.innerHTML = '<div style="color:#94a3b8">¡Excelente! No hay reclamaciones reportadas.</div>';
+            return;
+        }
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Reclamaciones',
+                    data: values,
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+    }
+
+    // --- 4. THREE.JS BACKGROUND ANIMATION ---
+    function initThreeJS() {
+        const canvas = document.getElementById('bgCanvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 30;
+
+        // Crear Partículas
+        const geometry = new THREE.BufferGeometry();
+        const count = 400;
+        const positions = new Float32Array(count * 3);
+        
+        for(let i=0; i<count*3; i++) {
+            positions[i] = (Math.random() - 0.5) * 60;
+        }
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({ size: 0.2, color: 0x60a5fa });
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // Crear lineas de red
+        const lineGeo = new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(20, 1));
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.1 });
+        const sphere = new THREE.LineSegments(lineGeo, lineMat);
+        scene.add(sphere);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.y += 0.001;
+            particles.rotation.x += 0.0005;
+            sphere.rotation.y -= 0.002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+
+    initStats();
+    initThreeJS();
+
+</script>
+</body>
+</html>
